@@ -110,36 +110,36 @@ convertAddress(Bin,BitsNum,Tag,Idx,directMap) :-
 getPriorityByIndex([],_,_,Acc,Acc).
 	
 getPriorityByIndex([H|T],Index):- 
-					getPriorityByIndex(T,H,0,0,Index).
+	getPriorityByIndex(T,H,0,0,Index).
 
 
 getPriorityByIndex([item(_,_,ValidBit1,Order1)|T],item(_,_,ValidBit2,Order2),Counter,Acc,Index):-
-				ValidBit1 = 0,
-				ValidBit2 = 1,
-				Counter1 is Counter + 1,
-				getPriorityByIndex(T,item(_,_,ValidBit1,Order1),Counter1,Counter1,Index).
+	ValidBit1 = 0,
+	ValidBit2 = 1,
+	Counter1 is Counter + 1,
+	getPriorityByIndex(T,item(_,_,ValidBit1,Order1),Counter1,Counter1,Index).
 	
 
 getPriorityByIndex([item(_,_,ValidBit1,Order1)|T],item(_,_,ValidBit2,Order2),Counter,Acc,Index):-
-				ValidBit1 = 1,
-				ValidBit2 = 0,
-				Counter1 is Counter + 1,
-				getPriorityByIndex(T,item(_,_,ValidBit2,Order2),Counter1,Acc,Index).	
+	ValidBit1 = 1,
+	ValidBit2 = 0,
+	Counter1 is Counter + 1,
+	getPriorityByIndex(T,item(_,_,ValidBit2,Order2),Counter1,Acc,Index).	
 				
 				
 				
 getPriorityByIndex([item(_,_,ValidBit1,Order1)|T],item(_,_,ValidBit2,Order2),Counter,Acc,Index):-
-			ValidBit1 = ValidBit2,
-			Counter1 is Counter + 1,
-			Order1 < Order2,
-			getPriorityByIndex(T,item(_,_,ValidBit1,Order2),Counter1,Acc,Index).			
+	ValidBit1 = ValidBit2,
+	Counter1 is Counter + 1,
+	Order1 < Order2,
+	getPriorityByIndex(T,item(_,_,ValidBit1,Order2),Counter1,Acc,Index).			
 			
 					
 getPriorityByIndex([item(_,_,ValidBit1,Order1)|T],item(_,_,ValidBit2,Order2),Counter,Acc,Index):-
-			ValidBit1 = ValidBit2,
-			Counter1 is Counter + 1,
-			Order1 > Order2,
-			getPriorityByIndex(T,item(_,_,ValidBit1,Order1),Counter1,Counter1,Index).					
+	ValidBit1 = ValidBit2,
+	Counter1 is Counter + 1,
+	Order1 > Order2,
+	getPriorityByIndex(T,item(_,_,ValidBit1,Order1),Counter1,Counter1,Index).					
 					
 	
 getIthItem(L,I,Z):- getIthItem(L,I,0,Z).
@@ -147,59 +147,60 @@ getIthItem(L,I,Z):- getIthItem(L,I,0,Z).
 getIthItem([H|_],I,I,H).
 
 getIthItem([H|T],I,Counter,Z):-
-			Counter \= I,
-			Counter1 is Counter +1,
-			getIthItem(T,I,Counter1,Z).
+	Counter \= I,
+	Counter1 is Counter +1,
+	getIthItem(T,I,Counter1,Z).
 			
 			
 replaceInCache(Tag,Idx,Mem,OldCache,NewCache,ItemData,directMap,BitsNum):- 	
-		atom_number(Tagf,Tag),
-		atom_number(Idxf,Idx),
-		string_concat(Tagf,Idxf,Addressf),
-		atom_number(Addressf,Addressk),
-		convertBinToDec(Addressk,N),
-		getIthItem(Mem,N,ItemData),
-		atom_number(TagString,Tag),
-		OldCache = [item(tag(TagString2),_,_,_)|_],
-		atom_length(TagString,X),
-		atom_length(TagString2,Y),
-		Z is Y - X,		
-		fillZeros(TagString,Z,NewTag),
-		convertBinToDec(Idx,Index),
-		NewItem = item(tag(NewTag),data(ItemData),1,0),
-		replaceIthItem(NewItem,OldCache,Index,NewCache).
+	atom_number(Tagf,Tag),
+	atom_number(Idxf,Idx),
+	string_concat(Tagf,Idxf,Addressf),
+	atom_number(Addressf,Addressk),
+	convertBinToDec(Addressk,N),
+	getIthItem(Mem,N,ItemData),
+	atom_number(TagString,Tag),
+	OldCache = [item(tag(TagString2),_,_,_)|_],
+	atom_length(TagString,X),
+	atom_length(TagString2,Y),
+	Z is Y - X,		
+	fillZeros(TagString,Z,NewTag),
+	convertBinToDec(Idx,Index),
+	NewItem = item(tag(NewTag),data(ItemData),1,0),
+	replaceIthItem(NewItem,OldCache,Index,NewCache).
 		
 
 getData(StringAddress,OldCache,Mem,NewCache,Data,HopsNum,Type,BitsNum,hit):-
-		getDataFromCache(StringAddress,OldCache,Data,HopsNum,Type,BitsNum),
-		NewCache = OldCache.
+	getDataFromCache(StringAddress,OldCache,Data,HopsNum,Type,BitsNum),
+	NewCache = OldCache.
 
 getData(StringAddress,OldCache,Mem,NewCache,Data,HopsNum,Type,BitsNum,miss):-
-		\+getDataFromCache(StringAddress,OldCache,Data,HopsNum,Type,BitsNum),
-		atom_number(StringAddress,Address),
-		convertAddress(Address,BitsNum,Tag,Idx,Type),
-		replaceInCache(Tag,Idx,Mem,OldCache,NewCache,Data,Type,BitsNum).
+	\+getDataFromCache(StringAddress,OldCache,Data,HopsNum,Type,BitsNum),
+	atom_number(StringAddress,Address),
+	convertAddress(Address,BitsNum,Tag,Idx,Type),
+	replaceInCache(Tag,Idx,Mem,OldCache,NewCache,Data,Type,BitsNum).
 		
 runProgram([],OldCache,_,OldCache,[],[],Type,_).
 
 runProgram([Address|AdressList],OldCache,Mem,FinalCache,[Data|OutputDataList],[Status|StatusList],Type,NumOfSets):-
-						getNumBits(NumOfSets,Type,OldCache,BitsNum),
-						getData(Address,OldCache,Mem,NewCache,Data,HopsNum,Type,BitsNum,Status),
-						runProgram(AdressList,NewCache,Mem,FinalCache,OutputDataList,StatusList,
-						Type,NumOfSets).						
+	getNumBits(NumOfSets,Type,OldCache,BitsNum),
+	getData(Address,OldCache,Mem,NewCache,Data,HopsNum,Type,BitsNum,Status),
+	runProgram(AdressList,NewCache,Mem,FinalCache,OutputDataList,StatusList,
+		Type,NumOfSets).
+
 %endFlag
 			%FullyAssociative
 
 getDataFromCache(StringAddress,Cache,Data,HopsNum,fullyAssoc,0):-
-			getDataFromCache(StringAddress,Cache,Data,HopsNum,0,fullyAssoc,0).
+	getDataFromCache(StringAddress,Cache,Data,HopsNum,0,fullyAssoc,0).
 						
 getDataFromCache(Tag,[item(tag(Tag),data(Data),1,_)|T],Data,Counter,Counter,fullyAssoc,0).
 
 getDataFromCache(StringAddress,[item(tag(Tag),_,_,_)|T],Data,HopsNum,Counter,fullyAssoc,0):-
-		StringAddress \= Tag,
-		Counter1 is Counter + 1,
-		getDataFromCache(StringAddress,T,Data,HopsNum,Counter1,fullyAssoc,0).
+	StringAddress \= Tag,
+	Counter1 is Counter + 1,
+	getDataFromCache(StringAddress,T,Data,HopsNum,Counter1,fullyAssoc,0).
 		
 convertAddress(Bin,_,Tag,_,fullyAssoc):-
-		atom_number(Temp,Bin),
-		atom_number(Temp,Tag).
+	atom_number(Temp,Bin),
+	atom_number(Temp,Tag).
