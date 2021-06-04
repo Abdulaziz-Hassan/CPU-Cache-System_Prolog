@@ -204,3 +204,19 @@ getDataFromCache(StringAddress,[item(tag(Tag),_,_,_)|T],Data,HopsNum,Counter,ful
 convertAddress(Bin,_,Tag,_,fullyAssoc):-
 	atom_number(Temp,Bin),
 	atom_number(Temp,Tag).
+
+
+replaceInCache(Tag,Idx,Mem,OldCache,NewCache,ItemData,fullyAssoc,BitsNum):- 	
+
+	convertBinToDec(Tag,N),
+	getIthItem(Mem,N,ItemData),
+	atom_number(TagString,Tag),
+	OldCache = [item(tag(TagString2),_,_,_)|_],
+	atom_length(TagString,X),
+	atom_length(TagString2,Y),
+	Z is Y - X,		
+	fillZeros(TagString,Z,NewTag),
+	getPriorityByIndex(OldCache,Index),
+	NewItem = item(tag(NewTag),data(ItemData),1,0),
+	replaceIthItem(NewItem,OldCache,Index,NewCache).
+		
