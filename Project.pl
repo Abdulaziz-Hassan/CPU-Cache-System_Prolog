@@ -155,7 +155,10 @@ getIthItem([H|T],I,Counter,Z):-
 replaceInCache(Tag,Idx,Mem,OldCache,NewCache,ItemData,directMap,BitsNum):- 	
 	atom_number(Tagf,Tag),
 	atom_number(Idxf,Idx),
-	string_concat(Tagf,Idxf,Addressf),
+	atom_length(Idxf,IndexLength),
+	NewIndexLength is BitsNum - IndexLength,
+	fillZeros(Idxf,NewIndexLength,NewIdxf),
+	string_concat(Tagf,NewIdxf,Addressf),
 	atom_number(Addressf,Addressk),
 	convertBinToDec(Addressk,N),
 	getIthItem(Mem,N,ItemData),
@@ -207,7 +210,6 @@ convertAddress(Bin,_,Tag,_,fullyAssoc):-
 
 
 replaceInCache(Tag,Idx,Mem,OldCache,NewCache,ItemData,fullyAssoc,BitsNum):- 	
-
 	convertBinToDec(Tag,N),
 	getIthItem(Mem,N,ItemData),
 	atom_number(TagString,Tag),
@@ -218,5 +220,5 @@ replaceInCache(Tag,Idx,Mem,OldCache,NewCache,ItemData,fullyAssoc,BitsNum):-
 	fillZeros(TagString,Z,NewTag),
 	getPriorityByIndex(OldCache,Index),
 	NewItem = item(tag(NewTag),data(ItemData),1,0),
-	replaceIthItem(NewItem,OldCache,Index,NewCache).
+	replaceIthItem(NewItem,OldCache,Index,NewCache).	
 		
