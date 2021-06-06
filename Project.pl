@@ -71,6 +71,7 @@ getNumBits(NumOfSets,setAssoc,[_|_],BitsNum):-
 fillZeros(R,0,R).
 
 fillZeros(String,N,R) :-
+	N > 0,
 	string_concat('0', String, String2),
 	N1 is N - 1,
 	fillZeros(String2,N1,R).
@@ -107,10 +108,11 @@ convertAddress(Bin,BitsNum,Tag,Idx,directMap) :-
 	Tag is Bin // 10**BitsNum,
 	Idx is Bin mod 10**BitsNum.
 	
-getPriorityByIndex([],_,_,Acc,Acc).
-	
 getPriorityByIndex([H|T],Index):- 
 	getPriorityByIndex(T,H,0,0,Index).
+
+
+getPriorityByIndex([],_,_,Acc,Acc).
 
 
 getPriorityByIndex([item(_,_,ValidBit1,Order1)|T],item(_,_,ValidBit2,Order2),Counter,Acc,Index):-
@@ -221,4 +223,4 @@ replaceInCache(Tag,Idx,Mem,OldCache,NewCache,ItemData,fullyAssoc,BitsNum):-
 	getPriorityByIndex(OldCache,Index),
 	NewItem = item(tag(NewTag),data(ItemData),1,0),
 	replaceIthItem(NewItem,OldCache,Index,NewCache).	
-		
+		   
