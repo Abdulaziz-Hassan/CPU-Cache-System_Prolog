@@ -277,8 +277,10 @@ getData(StringAddress,OldCache,Mem,NewCache,Data,HopsNum,Type,BitsNum,miss):-
 
 runProgram([],OldCache,_,OldCache,[],[],Type,_).
 
-runProgram([Address|AdressList],OldCache,Mem,FinalCache,[Data|OutputDataList],[Status|StatusList],Type,NumOfSets):-
+runProgram([Address|AdressList],OldCache,Mem,FinalCache,
+[Data|OutputDataList],[Status|StatusList],Type,NumOfSets):-
 	getNumBits(NumOfSets,Type,OldCache,BitsNum),
-	getData(Address,OldCache,Mem,NewCache,Data,HopsNum,Type,BitsNum,Status),
+	(Type = setAssoc, Num = NumOfSets; Type \= setAssoc, Num = BitsNum),
+	getData(Address,OldCache,Mem,NewCache,Data,HopsNum,Type,Num,Status),
 	runProgram(AdressList,NewCache,Mem,FinalCache,OutputDataList,StatusList,
-		Type,NumOfSets).
+	Type,NumOfSets).
